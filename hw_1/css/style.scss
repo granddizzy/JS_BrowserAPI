@@ -1,0 +1,83 @@
+@import "default";
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.header {
+  font-size: 24px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.lessonsContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  
+  &__row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+  }
+  
+  &__col {
+    width: 50%;
+  }
+  
+  .lesson {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #dddddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    width: 440px;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
+    
+    &__buttons {
+      display: flex;
+      gap: 10px;
+    }
+  }
+}
+
+.lesson__buttons {
+  button {
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+  }
+  
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 930px) {
+  .lessonsContainer {
+    justify-content: center;
+  }
+}
+
+
+

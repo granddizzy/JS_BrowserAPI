@@ -1,10 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="script.js" defer></script>
+  <title>Расписание занятий</title>
 </head>
 <body>
-
+<div class="container header">Расписание занятий</div>
+<div class="container lessonsContainer">
+  <template class="lessonTemplate">
+    <div class="lessonsContainer__lesson lesson" data-id="">
+      <div class="lessonsContainer__row">
+        <div class="lesson__nameLabel lessonsContainer__col">Название предмета:</div>
+        <div class="lesson__name lessonsContainer__col"></div>
+      </div>
+      <div class="lessonsContainer__row">
+        <div class="lesson__timeLabel lessonsContainer__col">Время занятия:</div>
+        <div class="lesson__time lessonsContainer__col"></div>
+      </div>
+      <div class="lessonsContainer__row">
+        <div class="lesson__maxParticipantsLabel lessonsContainer__col">Макс. участников:</div>
+        <div class="lesson__maxParticipants lessonsContainer__col"></div>
+      </div>
+      <div class="lessonsContainer__row">
+        <div class="lesson__currentParticipantsLabel lessonsContainer__col">Текущие участники:</div>
+        <div class="lesson__currentParticipants lessonsContainer__col"></div>
+      </div>
+      <div class="lesson__buttons lessonButtons">
+        <button class="lessonButtons__signup">Записаться</button>
+        <button class="lessonButtons__cancel">Отменить</button>
+      </div>
+    </div>
+  </template>
+</div>
 </body>
 </html>
