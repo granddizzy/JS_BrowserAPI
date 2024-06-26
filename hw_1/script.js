@@ -19,7 +19,8 @@ lessonsContainerEl.addEventListener('click', (e) => {
 })
 
 function lessonSignup(lessonId) {
-  const lessonObj = getLessonById(lessonId);
+  const lessons = loadLessonsFromLocalStorage
+  lessonObj = lessons.find(el => el.id === lessonId);
   if (lessonObj && lessonObj.currentParticipants < lessonObj.maxParticipants) {
     lessonObj.currentParticipants++;
     lessonObj.enrolled = true;
@@ -29,17 +30,14 @@ function lessonSignup(lessonId) {
 }
 
 function lessonCancel(lessonId) {
-  const lessonObj = getLessonById(lessonId);
+  const lessons = loadLessonsFromLocalStorage
+  lessonObj = lessons.find(el => el.id === lessonId);
   if (lessonObj && lessonObj.enrolled) {
     lessonObj.currentParticipants--;
     lessonObj.enrolled = false;
     updateLessonNode(lessonObj);
     saveToLocalStorage(lessons);
   }
-}
-
-function getLessonById(lessonId) {
-  return lessons.find(el => el.id === lessonId);
 }
 
 function loadLessonsFromLocalStorage() {
