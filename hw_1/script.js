@@ -2,10 +2,10 @@ if (!localStorage.getItem('lessons')) {
   localStorage.setItem('lessons', getInitialData());
 }
 
-const lessons = loadFromLocalStorage();
+const lessons = loadLessonsFromLocalStorage();
 const lessonsContainerEl = document.querySelector('.lessonsContainer')
 lessons.forEach((el) => {
-  lessonsContainerEl.appendChild(createLessonNode(el))
+  lessonsContainerEl.append(createLessonNode(el))
 })
 
 lessonsContainerEl.addEventListener('click', (e) => {
@@ -19,28 +19,30 @@ lessonsContainerEl.addEventListener('click', (e) => {
 })
 
 function lessonSignup(lessonId) {
-  const lessons = loadFromLocalStorage()
-  const lesson = lessons.find(el => el.id === lessonId);
-  if (lesson && lesson.currentParticipants < lesson.maxParticipants) {
-    lesson.currentParticipants++;
-    lesson.enrolled = true;
+  const lessonObj = getLessonById(lessonId);
+  if (lessonObj && lessonObj.currentParticipants < lessonObj.maxParticipants) {
+    lessonObj.currentParticipants++;
+    lessonObj.enrolled = true;
+    updateLessonNode(lessonObj);
     saveToLocalStorage(lessons);
-    updateLessonNode(lessonId, lesson.currentParticipants);
   }
 }
 
 function lessonCancel(lessonId) {
-  const lessons = loadFromLocalStorage();
-  const lesson = lessons.find(el => el.id === lessonId);
-  if (lesson && lesson.currentParticipants > 0) {
-    lesson.currentParticipants--;
-    lesson.enrolled = false;
+  const lessonObj = getLessonById(lessonId);
+  if (lessonObj && lessonObj.enrolled) {
+    lessonObj.currentParticipants--;
+    lessonObj.enrolled = false;
+    updateLessonNode(lessonObj);
     saveToLocalStorage(lessons);
-    updateLessonNode(lessonId, lesson.currentParticipants);
   }
 }
 
-function loadFromLocalStorage() {
+function getLessonById(lessonId) {
+  return lessons.find(el => el.id === lessonId);
+}
+
+function loadLessonsFromLocalStorage() {
   const storedLessons = localStorage.getItem('lessons');
   return storedLessons ? JSON.parse(storedLessons) : [];
 }
@@ -111,12 +113,10 @@ function checkLessonButtons(lessonEl, lessonObj) {
   lessonButtonCancelEl.disabled = !lessonObj.enrolled;
 }
 
-function updateLessonNode(lessonId, currentParticipants) {
-  const lessonEl = document.querySelector(`.lesson[data-id="${lessonId}"]`);
+function updateLessonNode(lessonObj) {
+  const lessonEl = document.querySelector(`.lesson[data-id="${lessonObj.id}"]`);
   if (lessonEl) {
-    lessonEl.querySelector('.lesson__currentParticipants').textContent = currentParticipants;
-    const lessons = loadFromLocalStorage();
-    const lesson = lessons.find(el => el.id === lessonId);
-    checkLessonButtons(lessonEl, lesson);
+    lessonEl.querySelector('.lesson__currentParticipants').textContent = lessonObj.currentParticipants;
+    checkLessonButtons(lessonEl, lessonObj);
   }
 }
