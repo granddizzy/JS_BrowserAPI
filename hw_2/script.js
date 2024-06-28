@@ -4,43 +4,56 @@ sliders.forEach(el => {
   sliderContainerEl.append(createSlideNode(el));
 });
 
-let currentSlide = 0;
+let currentSlide = 1;
 const totalSlides = sliders.length;
 const navContainerEl = document.querySelector('.slider__nav');
+
+const intervalId = setInterval(nextSlide, 5000);
 
 sliders.forEach((el, index) => {
   const navDot = document.createElement('div');
   navDot.classList.add('slider__nav-dot');
   if (index === 0) navDot.classList.add('slider__nav-dot--active');
   navDot.addEventListener('click', () => {
-    currentSlide = index;
+    currentSlide = index + 1;
     updateSlidePosition();
     updateNavDots();
   });
   navContainerEl.append(navDot);
 });
 
-document.querySelector('.slider__control--prev').addEventListener('click', () => {
-  currentSlide = (currentSlide > 0) ? currentSlide - 1 : totalSlides - 1;
-  updateSlidePosition();
-  updateNavDots();
+const sliderControls = document.querySelector('.slider__controls');
+sliderControls.addEventListener('click', (e) => {
+  if (e.target.classList.contains('slider__control--prev')) {
+    prevSlide();
+    clearInterval(intervalId);
+  } else if (e.target.classList.contains('slider__control--next')) {
+    nextSlide();
+    clearInterval(intervalId);
+  }
 });
 
-document.querySelector('.slider__control--next').addEventListener('click', () => {
-  currentSlide = (currentSlide < totalSlides - 1) ? currentSlide + 1 : 0;
+function nextSlide() {
+  currentSlide = (currentSlide < totalSlides) ? currentSlide + 1 : 1;
   updateSlidePosition();
   updateNavDots();
-});
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide > 0) ? currentSlide - 1 : totalSlides;
+  updateSlidePosition();
+  updateNavDots();
+}
 
 function updateSlidePosition() {
-  const offset = -currentSlide * 100;
+  const offset = -(currentSlide - 1) * 100;
   sliderContainerEl.style.transform = `translateX(${offset}%)`;
 }
 
 function updateNavDots() {
   const navDots = document.querySelectorAll('.slider__nav-dot');
   navDots.forEach((dot, index) => {
-    dot.classList.toggle('slider__nav-dot--active', index === currentSlide);
+    dot.classList.toggle('slider__nav-dot--active', index === currentSlide - 1);
   });
 }
 

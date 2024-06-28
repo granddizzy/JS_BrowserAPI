@@ -22,10 +22,11 @@ body {
   
   &__container {
     display: flex;
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.5s ease;
   }
   
   &__item {
+    flex: 0 0 100%;
     min-width: 100%;
     box-sizing: border-box;
     
