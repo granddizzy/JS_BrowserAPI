@@ -1,25 +1,30 @@
-const sliders = getSliders();
-const sliderContainerEl = document.querySelector('.slider__container')
-sliders.forEach(el => {
+const slides = getSlides();
+const sliderContainerEl = document.querySelector('.slider__container');
+slides.forEach(el => {
   sliderContainerEl.append(createSlideNode(el));
 });
 
 let currentSlide = 1;
-const totalSlides = sliders.length;
+const totalSlides = slides.length;
 const navContainerEl = document.querySelector('.slider__nav');
 
-const intervalId = setInterval(nextSlide, 5000);
+const intervalValue = 3000;
+let intervalId = setInterval(nextSlide, intervalValue);
 
-sliders.forEach((el, index) => {
-  const navDot = document.createElement('div');
-  navDot.classList.add('slider__nav-dot');
-  if (index === 0) navDot.classList.add('slider__nav-dot--active');
-  navDot.addEventListener('click', () => {
-    currentSlide = index + 1;
+navContainerEl.addEventListener('click', (e) => {
+  if (e.target.classList.contains('slider__nav-dot')) {
+    currentSlide = +e.target.getAttribute('data-id');
     updateSlidePosition();
     updateNavDots();
-  });
-  navContainerEl.append(navDot);
+  }
+});
+
+slides.forEach((el, index) => {
+  const navDotEl = document.createElement('div');
+  navDotEl.classList.add('slider__nav-dot');
+  if (index === 0) navDotEl.classList.add('slider__nav-dot--active');
+  navDotEl.setAttribute('data-id', index + 1);
+  navContainerEl.append(navDotEl);
 });
 
 const sliderControls = document.querySelector('.slider__controls');
@@ -30,6 +35,7 @@ sliderControls.addEventListener('click', (e) => {
   } else if (e.target.classList.contains('slider__control--next')) {
     nextSlide();
     clearInterval(intervalId);
+    intervalId = setInterval(nextSlide, intervalValue);
   }
 });
 
@@ -66,9 +72,9 @@ function createSlideNode(slideObj) {
   return slideNode;
 }
 
-function getSliders() {
-  const slidersJson = getInitialData();
-  return slidersJson ? JSON.parse(slidersJson) : [];
+function getSlides() {
+  const slidesJson = getInitialData();
+  return slidesJson ? JSON.parse(slidesJson) : [];
 }
 
 function getInitialData() {
