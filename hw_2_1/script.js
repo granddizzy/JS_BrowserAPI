@@ -50,40 +50,41 @@ navContainerEl.addEventListener('click', (e) => {
   }
 });
 
-// событие на управление
 const sliderControls = document.querySelector('.slider__controls');
-sliderControls.addEventListener('click', (e) => {
-  if (e.target.classList.contains('slider__control--prev')) {
-    nextSlide();
-    resetInterval();
-  } else if (e.target.classList.contains('slider__control--next')) {
-    prevSlide();
-    resetInterval();
-  }
-});
 
 // Добавляем поддержку свайпов
 let touchStartX = 0;
 let touchEndX = 0;
-let isTouching = false;
 
-slider.addEventListener('touchstart', (e) => {
-  touchStartX = e.changedTouches[0].screenX;
-  e.preventDefault();
-  clearInterval(intervalId);
-  isTouching = true;
-});
+// событие на управление
+if (isTouchDevice()) {
+  sliderControls.style.display = 'none';
 
-slider.addEventListener('touchmove', (e) => {
-  if (!isTouching) return;
+  slider.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    e.preventDefault();
+    // отключаем автослайд пока пользователь держит тач
+    clearInterval(intervalId);
+  });
+
+  slider.addEventListener('touchmove', (e) => {
     touchEndX = e.changedTouches[0].screenX;
-});
+  });
 
-slider.addEventListener('touchend', (e) => {
-  if (!isTouching) return;
-  isTouching = false;
-  handleGesture();
-});
+  slider.addEventListener('touchend', (e) => {
+    handleGesture();
+  });
+} else {
+  sliderControls.addEventListener('click', (e) => {
+    if (e.target.classList.contains('slider__control--prev')) {
+      nextSlide();
+      resetInterval();
+    } else if (e.target.classList.contains('slider__control--next')) {
+      prevSlide();
+      resetInterval();
+    }
+  });
+}
 
 updateSlidePosition();
 
@@ -198,4 +199,8 @@ function getInitialData() {
   }
 ]
 `;
+}
+
+function isTouchDevice() {
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
