@@ -32,6 +32,7 @@ sliderControls.addEventListener('click', (e) => {
   if (e.target.classList.contains('slider__control--prev')) {
     prevSlide();
     clearInterval(intervalId);
+    intervalId = setInterval(nextSlide, intervalValue);
   } else if (e.target.classList.contains('slider__control--next')) {
     nextSlide();
     clearInterval(intervalId);
