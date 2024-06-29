@@ -47,7 +47,7 @@ function nextSlide() {
 }
 
 function prevSlide() {
-  currentSlide = (currentSlide > 0) ? currentSlide - 1 : totalSlides;
+  currentSlide = (currentSlide > 1) ? currentSlide - 1 : totalSlides;
   updateSlidePosition();
   updateNavDots();
 }
