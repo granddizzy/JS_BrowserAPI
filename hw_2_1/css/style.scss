@@ -25,19 +25,19 @@ body {
   &__container {
     display: flex;
     align-items: center;
-    height: 500px;
+    height: 400px;
     margin: 0 auto;
-    position: relative;
   }
   
   &__item {
     position: absolute;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.5s ease-in-out;
     width: 330px;
     z-index: 0;
     background-size: contain;
     opacity: 0;
     border-radius: 15px;
+    left: 15%;
     
     img {
       width: 100%;

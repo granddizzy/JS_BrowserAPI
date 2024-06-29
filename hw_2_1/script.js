@@ -1,5 +1,6 @@
 const slides = getSlides();
-const sliderContainerEl = document.querySelector('.slider__container');
+const slider = document.querySelector('.slider');
+const sliderContainerEl = slider.querySelector('.slider__container');
 slides.forEach(el => {
   sliderContainerEl.append(createSlideNode(el));
 });
@@ -64,25 +65,33 @@ sliderControls.addEventListener('click', (e) => {
 // Добавляем поддержку свайпов
 let touchStartX = 0;
 let touchEndX = 0;
+let isTouching = false;
 
-sliderContainerEl.addEventListener('touchstart', (e) => {
+slider.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
+  e.preventDefault();
+  clearInterval(intervalId);
+  isTouching = true;
 });
 
-sliderContainerEl.addEventListener('touchmove', (e) => {
-  touchEndX = e.changedTouches[0].screenX;
+slider.addEventListener('touchmove', (e) => {
+  if (!isTouching) return;
+    touchEndX = e.changedTouches[0].screenX;
 });
 
-sliderContainerEl.addEventListener('touchend', (e) => {
+slider.addEventListener('touchend', (e) => {
+  if (!isTouching) return;
+  isTouching = false;
   handleGesture();
 });
 
 updateSlidePosition();
 
 function handleGesture() {
-  if (touchEndX < touchStartX) {
+  const delta = touchEndX - touchStartX;
+  if (delta < -100) {
     nextSlide();
-  } else if (touchEndX > touchStartX) {
+  } else if (delta > 100) {
     prevSlide();
   }
   resetInterval();
@@ -166,6 +175,26 @@ function getInitialData() {
     "id": 5,
     "name": "Картинка 5",
     "imgPath": "./img/5.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Картинка 6",
+    "imgPath": "./img/6.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Картинка 7",
+    "imgPath": "./img/7.jpg"
+  },
+  {
+    "id": 8,
+    "name": "Картинка 8",
+    "imgPath": "./img/8.jpg"
+  },
+  {
+    "id": 9,
+    "name": "Картинка 9",
+    "imgPath": "./img/9.jpg"
   }
 ]
 `;
