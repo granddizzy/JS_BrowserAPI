@@ -16,6 +16,7 @@ navContainerEl.addEventListener('click', (e) => {
     currentSlide = +e.target.getAttribute('data-id');
     updateSlidePosition();
     updateNavDots();
+    resetInterval();
   }
 });
 
@@ -31,14 +32,17 @@ const sliderControls = document.querySelector('.slider__controls');
 sliderControls.addEventListener('click', (e) => {
   if (e.target.classList.contains('slider__control--prev')) {
     prevSlide();
-    clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, intervalValue);
+    resetInterval();
   } else if (e.target.classList.contains('slider__control--next')) {
     nextSlide();
-    clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, intervalValue);
+    resetInterval();
   }
 });
+
+function resetInterval() {
+  clearInterval(intervalId);
+  intervalId = setInterval(nextSlide, intervalValue);
+}
 
 function nextSlide() {
   currentSlide = (currentSlide < totalSlides) ? currentSlide + 1 : 1;
