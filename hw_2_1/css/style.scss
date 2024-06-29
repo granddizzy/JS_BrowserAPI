@@ -19,28 +19,23 @@ body {
 }
 
 .slider {
-  //position: relative;
+  position: relative;
   width: 100%;
   
   &__container {
     display: flex;
-    //transition: transform 0.5s ease;
     align-items: center;
-    //height: 400px;
+    height: 500px;
     margin: 0 auto;
     position: relative;
   }
   
   &__item {
-    //flex: 0 0 100%;
-    //min-width: 100%;
-    //box-sizing: border-box;
     position: absolute;
     transition: all 0.3s ease-in-out;
     width: 330px;
     z-index: 0;
     background-size: contain;
-    //height: 200px;
     opacity: 0;
     border-radius: 15px;
     
@@ -57,7 +52,6 @@ body {
   }
   
   &__item-2, &__item-4 {
-    //height: 250px;
     opacity: 0.8;
     width: 380px;
     z-index: 1;
@@ -70,7 +64,6 @@ body {
   
   &__item-3 {
     box-shadow: -2px 5px 33px 6px rgba(0,0,0,0.35);
-    //height: 300px;
     opacity: 1;
     left: 50%;
     transform: translateX(-50%);
@@ -96,6 +89,7 @@ body {
     display: flex;
     justify-content: space-between;
     transform: translateY(-50%);
+    z-index: 999;
   }
   
   &__control {
@@ -124,16 +118,13 @@ body {
     margin-right: 10px;
   }
   
-  &__templateItem {
-    display: none;
-  }
-  
   &__nav {
     position: absolute;
-    bottom: 10px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
+    z-index: 999;
   }
   
   &__nav-dot {

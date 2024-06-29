@@ -6,6 +6,8 @@ slides.forEach(el => {
 
 const sliderItems = sliderContainerEl.querySelectorAll('.slider__item');
 const sliderItemsArr = Array.from(sliderItems);
+// сдвигаю сразу на 2 чтобы первая картинка стала по центру
+sliderItemsArr.unshift(...sliderItemsArr.splice(-2));
 
 let currentSlide = 1;
 const totalSlides = slides.length;
@@ -14,14 +16,7 @@ const navContainerEl = document.querySelector('.slider__nav');
 const intervalValue = 3000;
 let intervalId = setInterval(nextSlide, intervalValue);
 
-navContainerEl.addEventListener('click', (e) => {
-  if (e.target.classList.contains('slider__nav-dot')) {
-    currentSlide = +e.target.getAttribute('data-id');
-    updateSlidePosition();
-    updateNavDots();
-  }
-});
-
+// добавляем слайды
 slides.forEach((el, index) => {
   const navDotEl = document.createElement('div');
   navDotEl.classList.add('slider__nav-dot');
@@ -30,30 +25,83 @@ slides.forEach((el, index) => {
   navContainerEl.append(navDotEl);
 });
 
+// событие на точки
+navContainerEl.addEventListener('click', (e) => {
+  if (e.target.classList.contains('slider__nav-dot')) {
+    const currentSlideNum = +e.target.getAttribute('data-id');
+
+    if (currentSlideNum === currentSlide) return;
+
+    if (currentSlideNum < currentSlide) {
+      for (let i = currentSlideNum; i < currentSlide; i++) {
+        sliderItemsArr.unshift(sliderItemsArr.pop());
+      }
+    } else {
+      for (let i = currentSlide; i < currentSlideNum; i++) {
+        sliderItemsArr.push(sliderItemsArr.shift());
+      }
+    }
+
+    currentSlide = currentSlideNum;
+    updateSlidePosition();
+    updateNavDots();
+    resetInterval();
+  }
+});
+
+// событие на управление
 const sliderControls = document.querySelector('.slider__controls');
 sliderControls.addEventListener('click', (e) => {
   if (e.target.classList.contains('slider__control--prev')) {
-    prevSlide();
-    clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, intervalValue);
-  } else if (e.target.classList.contains('slider__control--next')) {
     nextSlide();
-    clearInterval(intervalId);
-    intervalId = setInterval(nextSlide, intervalValue);
+    resetInterval();
+  } else if (e.target.classList.contains('slider__control--next')) {
+    prevSlide();
+    resetInterval();
   }
+});
+
+// Добавляем поддержку свайпов
+let touchStartX = 0;
+let touchEndX = 0;
+
+sliderContainerEl.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+sliderContainerEl.addEventListener('touchmove', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+});
+
+sliderContainerEl.addEventListener('touchend', (e) => {
+  handleGesture();
 });
 
 updateSlidePosition();
 
-function nextSlide() {
-  currentSlide = (currentSlide < totalSlides) ? currentSlide + 1 : 1;
+function handleGesture() {
+  if (touchEndX < touchStartX) {
+    nextSlide();
+  } else if (touchEndX > touchStartX) {
+    prevSlide();
+  }
+  resetInterval();
+}
+
+function resetInterval() {
+  clearInterval(intervalId);
+  intervalId = setInterval(nextSlide, intervalValue);
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide > 1) ? currentSlide - 1 : totalSlides;
   sliderItemsArr.unshift(sliderItemsArr.pop());
   updateSlidePosition();
   updateNavDots();
 }
 
-function prevSlide() {
-  currentSlide = (currentSlide > 1) ? currentSlide - 1 : totalSlides;
+function nextSlide() {
+  currentSlide = (currentSlide < totalSlides) ? currentSlide + 1 : 1;
   sliderItemsArr.push(sliderItemsArr.shift());
   updateSlidePosition();
   updateNavDots();
@@ -61,11 +109,7 @@ function prevSlide() {
 
 function updateSlidePosition() {
   sliderItems.forEach(el => {
-    el.classList.remove('slider__item-1');
-    el.classList.remove('slider__item-2');
-    el.classList.remove('slider__item-3');
-    el.classList.remove('slider__item-4');
-    el.classList.remove('slider__item-5');
+    el.classList.remove('slider__item-1', 'slider__item-2', 'slider__item-3', 'slider__item-4', 'slider__item-5');
   });
 
   // слайдов может быть больше 5 поэтому делаем срез
@@ -73,7 +117,6 @@ function updateSlidePosition() {
     el.classList.add(`slider__item-${i + 1}`);
   });
 }
-
 
 function updateNavDots() {
   const navDots = document.querySelectorAll('.slider__nav-dot');
