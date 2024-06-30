@@ -149,24 +149,43 @@ function showLikedPhotos(page) {
   const endIdx = startIdx + perPage;
   const pageLikedPhotos = likedPhotos.slice(startIdx, endIdx);
 
-  likedPhotosContainerEl.style.opacity = '0';
-
-  setTimeout(() => {
-    likedPhotosContainerEl.innerHTML = '';
-    pageLikedPhotos.forEach((el) => {
-      likedPhotosContainerEl.append(createLikedPhotoNode(el));
-    })
-  }, 300);
-
-  setTimeout(() => {
-    likedPhotosContainerEl.style.opacity = '1';
-    likedPhotosPageEl.textContent = page;
-    likedPhotosAllPageEl.textContent = allPages;
-  }, 500);
-
   // контроль доступности кнопок навигации
   likedPhotosPrevButtonEl.disabled = page <= 1;
   likedPhotosNextButtonEl.disabled = page >= allPages;
+
+  const displayedLikedPhotos = likedPhotosContainerEl.querySelectorAll('.liked-photo');
+  for (let i = 0; i < pageLikedPhotos.length; i++) {
+    if (displayedLikedPhotos.length >= i + 1) {
+      if (displayedLikedPhotos[i].getAttribute('data-id') !== pageLikedPhotos[i].id) {
+        const newNode = createLikedPhotoNode(pageLikedPhotos[i]);
+        const likedPhotoEl = newNode.querySelector('.liked-photo');
+        setTimeout(() => {
+          likedPhotoEl.style.opacity = '1';
+        }, 50);
+
+        displayedLikedPhotos[i].replaceWith(newNode);
+      }
+    } else {
+      const newNode = createLikedPhotoNode(pageLikedPhotos[i]);
+      const likedPhotoEl = newNode.querySelector('.liked-photo');
+      setTimeout(() => {
+        likedPhotoEl.style.opacity = '1';
+      }, 50);
+
+      likedPhotosContainerEl.append(newNode);
+    }
+  }
+
+  // проверим лишние фотографии
+  const numberUnnecessaryPhotos = displayedLikedPhotos.length - pageLikedPhotos.length;
+  if (numberUnnecessaryPhotos > 0) {
+    for (let i = 1; i <= numberUnnecessaryPhotos; i++) {
+      displayedLikedPhotos[displayedLikedPhotos.length - i].remove();
+    }
+  }
+
+  likedPhotosPageEl.textContent = page;
+  likedPhotosAllPageEl.textContent = allPages;
 }
 
 function createLikedPhotoNode(likedPhotoObj) {
