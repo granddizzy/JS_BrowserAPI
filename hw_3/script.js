@@ -28,6 +28,7 @@ let likedPhotosPage = 1;
 showRandomPhoto();
 showLikedPhotos(likedPhotosPage);
 
+// событие кнопки следующей случайной фотки
 randomNextButtonEl.addEventListener('click', e => {
   showRandomPhoto();
 })
@@ -109,23 +110,22 @@ async function showRandomPhoto() {
     const {urls, user} = data;
 
     randomPhotoImgEl.style.opacity = '0';
+    randomPhotoEl.setAttribute('data-id', data.id);
+    randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
+    randomPhotographerEl.textContent = `${user.name}`;
+    randomDescriptionEl.textContent = data.description;
+
+    const isLiked = isLikedPhoto(data.id) ? 1 : 0;
+    updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
+    updateRandomPhotoLikeButton(isLiked);
 
     setTimeout(() => {
-      randomPhotoEl.setAttribute('data-id', data.id);
       randomPhotoImgEl.src = urls.regular;
-      randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
-
-      randomPhotographerEl.textContent = `${user.name}`;
-      randomDescriptionEl.textContent = data.description;
-
-      const isLiked = isLikedPhoto(data.id) ? 1 : 0;
-      updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
-      updateRandomPhotoLikeButton(isLiked);
     }, 300);
 
-    setTimeout(() => {
+    randomPhotoImgEl.onload = () => {
       randomPhotoImgEl.style.opacity = '1';
-    }, 500);
+    };
 
   } catch (error) {
     console.error('Error fetching random photo:', error.message);
