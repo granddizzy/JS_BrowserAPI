@@ -11,13 +11,28 @@
 </head>
 <body>
 <div class="container">
-  <div class="photo">
-    <img class="photo__img" src="" alt="">
-    <div class="photo__info">
-      <p class="photo__photographer"></p>
-      <button class="photo__like-btn">Like</button>
-      <span class="photo__likes">0</span>
+  <div class="random-photo" data-id="">
+    <img class="random-photo__img" src="" alt="">
+    <div class="random-photo__info">
+      <p class="random-photo__photographer"></p>
+      <p class="random-photo__description"></p>
+      <button class="random-photo__like-btn">Like</button>
+      <span class="random-photo__likes">0</span>
     </div>
+  </div>
+  <div class="liked-photos"></div>
+  <template class="liked-photo__template">
+    <div class="liked-photo" data-id="">
+      <img class="liked-photo__image" src="" alt="">
+<!--      <p class="random-photo__description"></p>-->
+    </div>
+  </template>
+</div>
+<div id="modal" class="modal" data-id="">
+  <div class="modal__content">
+    <img class="modal__img" src="" alt="">
+    <p class="modal__description"></p>
+    <button class="modal__unlike-btn">UnLike</button>
   </div>
 </div>
 </body>
