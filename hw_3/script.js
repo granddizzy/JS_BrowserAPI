@@ -118,7 +118,7 @@ async function showRandomPhoto() {
       randomPhotographerEl.textContent = `${user.name}`;
       randomDescriptionEl.textContent = data.description;
 
-      const isLiked = checkLikedPhoto(data.id) ? 1 : 0;
+      const isLiked = isLikedPhoto(data.id) ? 1 : 0;
       updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
       updateRandomPhotoLikeButton(isLiked);
     }, 300);
@@ -223,7 +223,7 @@ function updateRandomPhotoLikeButton(isLiked) {
   }
 
   if (isLiked === undefined) {
-    isLiked = checkLikedPhoto(photoId);
+    isLiked = isLikedPhoto(photoId);
   }
 
   if (isLiked) {
@@ -237,14 +237,14 @@ function updateRandomPhotoLikeButton(isLiked) {
   }
 }
 
-function checkLikedPhoto(photoId) {
+function isLikedPhoto(photoId) {
   const likedPhotos = loadLikedPhotos();
   const index = likedPhotos.findIndex(e => e.id === photoId);
   return index >= 0;
 }
 
 function likePhoto(id, url, description, photographer) {
-  if (!checkLikedPhoto(id)) {
+  if (!isLikedPhoto(id)) {
     const likedPhotos = loadLikedPhotos();
     likedPhotos.push({'id': id, 'url': url, 'description': description, 'photographer': photographer});
     saveLikedPhotos(likedPhotos);
