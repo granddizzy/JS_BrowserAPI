@@ -7,6 +7,7 @@ const randomPhotoImgEl = randomPhotoEl.querySelector('.random-photo__img');
 const randomPhotographerEl = randomPhotoEl.querySelector('.random-photo__photographer');
 const randomDescriptionEl = randomPhotoEl.querySelector('.random-photo__description');
 const randomLikeButtonEl = randomPhotoEl.querySelector('.random-photo__like-btn');
+const randomNextButtonEl = randomPhotoEl.querySelector('.random-photo__next-btn');
 const randomLikesCountEl = randomPhotoEl.querySelector('.random-photo__likes');
 
 const likedPhotosEl = document.querySelector('.liked-photos');
@@ -14,6 +15,8 @@ const likedPhotosContainerEl = document.querySelector('.liked-photos__container'
 const likedPhotosNavigationEl = document.querySelector('.liked-photos__navigation');
 const likedPhotosPrevButtonEl = likedPhotosNavigationEl.querySelector('.liked-photos__prev-button');
 const likedPhotosNextButtonEl = likedPhotosNavigationEl.querySelector('.liked-photos__next-button');
+const likedPhotosAllPageEl = likedPhotosNavigationEl.querySelector('.liked-photos__allPages');
+const likedPhotosPageEl = likedPhotosNavigationEl.querySelector('.liked-photos__page');
 
 const modalEl = document.getElementById("modal");
 const modalUnlikeBtnEl = modalEl.querySelector(".modal__unlike-btn");
@@ -25,6 +28,10 @@ let likedPhotosPage = 1;
 
 showRandomPhoto();
 showLikedPhotos(likedPhotosPage);
+
+randomNextButtonEl.addEventListener('click', e => {
+  showRandomPhoto();
+})
 
 // открытие модального окна
 likedPhotosEl.addEventListener('click', (e) => {
@@ -98,27 +105,41 @@ async function showRandomPhoto() {
     const response = await fetch(`${apiUrl}${request}`, {
       headers: {'Authorization': `Client-ID ${unsplashApiKey}`}
     });
+
     if (!response.ok) {
       throw new Error('Failed to fetch random photo');
     }
+
     const data = await response.json();
     const {urls, user} = data;
-    randomPhotoEl.setAttribute('data-id', data.id);
-    randomPhotoImgEl.src = urls.regular;
-    randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
-    randomPhotographerEl.textContent = `${user.name}`;
-    randomDescriptionEl.textContent = data.description;
-    updateLikesCount(data.likes);
-    updateLikeButton(data.liked_by_user);
+
+    randomPhotoImgEl.style.opacity = '0';
+
+    setTimeout(() => {
+      randomPhotoEl.setAttribute('data-id', data.id);
+      randomPhotoImgEl.src = urls.regular;
+      randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
+
+      randomPhotographerEl.textContent = `${user.name}`;
+      randomDescriptionEl.textContent = data.description;
+      updateLikesCount(data.likes);
+      updateLikeButton(data.id);
+    }, 300);
+
+    setTimeout(() => {
+      randomPhotoImgEl.style.opacity = '1';
+    }, 500);
+
   } catch (error) {
     console.error('Error fetching random photo:', error.message);
+    updateLikeButton();
   }
 }
 
 function showLikedPhotos(page) {
   const likedPhotos = getLikedPhotos();
 
-  const perPage = 5;
+  const perPage = 4;
   const allPages = Math.ceil(likedPhotos.length / perPage);
 
   if (page > allPages) {
@@ -137,11 +158,13 @@ function showLikedPhotos(page) {
     pageLikedPhotos.forEach((el) => {
       likedPhotosContainerEl.append(createLikedPhotoNode(el));
     })
-  }, 320);
+  }, 300);
 
   setTimeout(() => {
     likedPhotosContainerEl.style.opacity = '1';
-  }, 320);
+    likedPhotosPageEl.textContent = page;
+    likedPhotosAllPageEl.textContent = allPages;
+  }, 500);
 
   // контроль доступности кнопок навигации
   likedPhotosPrevButtonEl.disabled = page === 1;
@@ -182,6 +205,7 @@ function likeButtonHandler() {
   likePhoto(photoId, photoUrl, photoDescription, photographer);
   updateLikesCount(+randomLikesCountEl.textContent + 1);
   updateLikeButton(photoId);
+  showLikedPhotos(likedPhotosPage);
 }
 
 function unlikeButtonHandler(e) {
@@ -189,9 +213,17 @@ function unlikeButtonHandler(e) {
   unlikePhoto(photoId);
   updateLikesCount(+randomLikesCountEl.textContent - 1);
   updateLikeButton(photoId);
+  showLikedPhotos(likedPhotosPage);
 }
 
 function updateLikeButton(photoId) {
+  if (!photoId) {
+    randomLikeButtonEl.disabled = true;
+    return;
+  } else {
+    randomLikeButtonEl.disabled = false;
+  }
+
   if (checkLikedPhoto(photoId)) {
     randomLikeButtonEl.textContent = 'UnLike';
     randomLikeButtonEl.removeEventListener('click', likeButtonHandler);
