@@ -35,15 +35,14 @@ body {
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 10px;
   margin-bottom: 20px; }
   .random-photo img {
-    max-width: 90%;
     border-radius: 10px;
     margin-bottom: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #ccc;
-    height: 50vh;
+    max-height: 55vh;
     opacity: 0;
     transition: opacity 0.3s ease; }
   .random-photo__info {
@@ -167,5 +166,14 @@ body {
     opacity: 1; }
   .modal.show .modal__content {
     transform: translateY(0); }
+
+@media (max-width: 1000px) {
+  .container {
+    width: 100%;
+    margin: 0 auto; }
+
+  .modal__content {
+    max-width: 90%;
+    padding: 10px; } }
 
 /*# sourceMappingURL=style.css.map */
