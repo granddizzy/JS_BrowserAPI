@@ -1,5 +1,4 @@
 const unsplashApiKey = '7jYubC3nifxliXTJ0Nad6-2v7oGSfr4lRjuXGmRTEvA';
-const user = 'granddizzy';
 const apiUrl = 'https://api.unsplash.com';
 
 const randomPhotoEl = document.querySelector('.random-photo');
@@ -120,7 +119,7 @@ async function showRandomPhoto() {
       randomDescriptionEl.textContent = data.description;
 
       const isLiked = checkLikedPhoto(data.id) ? 1 : 0;
-      updateRandomPhotoLikesCount(data.likes + isLiked ? 1 : 0);
+      updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
       updateRandomPhotoLikeButton(isLiked);
     }, 300);
 
