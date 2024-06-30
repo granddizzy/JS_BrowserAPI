@@ -10,6 +10,10 @@ const randomLikeButtonEl = randomPhotoEl.querySelector('.random-photo__like-btn'
 const randomLikesCountEl = randomPhotoEl.querySelector('.random-photo__likes');
 
 const likedPhotosEl = document.querySelector('.liked-photos');
+const likedPhotosContainerEl = document.querySelector('.liked-photos__container');
+const likedPhotosNavigationEl = document.querySelector('.liked-photos__navigation');
+const likedPhotosPrevButtonEl = likedPhotosNavigationEl.querySelector('.liked-photos__prev-button');
+const likedPhotosNextButtonEl = likedPhotosNavigationEl.querySelector('.liked-photos__next-button');
 
 const modalEl = document.getElementById("modal");
 const modalUnlikeBtnEl = modalEl.querySelector(".modal__unlike-btn");
@@ -17,8 +21,10 @@ const modalDescriptionEl = modalEl.querySelector(".modal__description");
 const modalPhotographerEl = modalEl.querySelector(".modal__photographer");
 const modalImgEl = modalEl.querySelector(".modal__img");
 
-// showRandomPhoto();
-showLikedPhotos();
+let likedPhotosPage = 1;
+
+showRandomPhoto();
+showLikedPhotos(likedPhotosPage);
 
 // открытие модального окна
 likedPhotosEl.addEventListener('click', (e) => {
@@ -44,7 +50,29 @@ modalUnlikeBtnEl.addEventListener('click', e => {
   const photoId = modalEl.getAttribute('data-id');
   unlikePhoto(photoId);
   closeModalWindow();
+  showLikedPhotos(likedPhotosPage);
 });
+
+// события навигации лайкнутыми изображениями
+likedPhotosNavigationEl.addEventListener('click', e => {
+  if (e.target.classList.contains('liked-photos__prev-button')) {
+    likedPhotosPage--;
+    likedPhotosPrev();
+  } else if (e.target.classList.contains('liked-photos__next-button')) {
+    likedPhotosPage++;
+    likedPhotosNext();
+  }
+})
+
+function likedPhotosPrev() {
+  const offset = -(likedPhotosPage - 1) * 100;
+  showLikedPhotos(likedPhotosPage);
+}
+
+function likedPhotosNext() {
+  const offset = -(likedPhotosPage + 1) * 100;
+  showLikedPhotos(likedPhotosPage);
+}
 
 function closeModalWindow() {
   modalEl.classList.remove("show");
@@ -87,11 +115,37 @@ async function showRandomPhoto() {
   }
 }
 
-async function showLikedPhotos() {
-  const likedPhotos = await getLikedPhotos();
-  likedPhotos.forEach((el) => {
-    likedPhotosEl.append(createLikedPhotoNode(el));
-  })
+function showLikedPhotos(page) {
+  const likedPhotos = getLikedPhotos();
+
+  const perPage = 5;
+  const allPages = Math.ceil(likedPhotos.length / perPage);
+
+  if (page > allPages) {
+    page = allPages;
+    likedPhotosPage = allPages;
+  }
+
+  const startIdx = (page - 1) * perPage;
+  const endIdx = startIdx + perPage;
+  const pageLikedPhotos = likedPhotos.slice(startIdx, endIdx);
+
+  likedPhotosContainerEl.style.opacity = '0';
+
+  setTimeout(() => {
+    likedPhotosContainerEl.innerHTML = '';
+    pageLikedPhotos.forEach((el) => {
+      likedPhotosContainerEl.append(createLikedPhotoNode(el));
+    })
+  }, 320);
+
+  setTimeout(() => {
+    likedPhotosContainerEl.style.opacity = '1';
+  }, 320);
+
+  // контроль доступности кнопок навигации
+  likedPhotosPrevButtonEl.disabled = page === 1;
+  likedPhotosNextButtonEl.disabled = page === allPages;
 }
 
 function createLikedPhotoNode(likedPhotoObj) {
@@ -168,6 +222,6 @@ function unlikePhoto(photoId) {
   saveLikedPhotos(likedPhotos);
 }
 
-async function getLikedPhotos() {
+function getLikedPhotos() {
   return loadLikedPhotos();
 }

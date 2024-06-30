@@ -21,7 +21,6 @@ img {
 
 body {
   font-family: Arial, sans-serif;
-  height: 100vh;
   background-color: #f0f0f0; }
 
 .container {
@@ -44,7 +43,7 @@ body {
     margin-bottom: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #ccc;
-    max-height: 70vh; }
+    max-height: 50vh; }
   .random-photo__info {
     margin-bottom: 10px;
     display: flex;
@@ -67,22 +66,51 @@ body {
       background-color: #0056b3; }
 
 .liked-photos {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  height: 150px;
-  gap: 10px; }
-  .liked-photos .liked-photo {
+  overflow: hidden; }
+  .liked-photos__container {
     display: flex;
-    height: 100%; }
-    .liked-photos .liked-photo__photographer, .liked-photos .liked-photo__description {
-      display: none; }
-    .liked-photos .liked-photo img {
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      border: 1px solid #ccc;
-      cursor: pointer; }
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: opacity 0.5s ease;
+    opacity: 0; }
+    .liked-photos__container .liked-photo {
+      display: flex;
+      height: 100%; }
+      .liked-photos__container .liked-photo__photographer, .liked-photos__container .liked-photo__description {
+        display: none; }
+      .liked-photos__container .liked-photo img {
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ccc;
+        cursor: pointer;
+        max-height: 150px;
+        max-width: none; }
+  .liked-photos__navigation {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 10px; }
+  .liked-photos__prev-button, .liked-photos__next-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; }
+    .liked-photos__prev-button:disabled, .liked-photos__next-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed; }
+    .liked-photos__prev-button:focus, .liked-photos__next-button:focus {
+      outline: none; }
+    .liked-photos__prev-button:hover:not(:disabled), .liked-photos__next-button:hover:not(:disabled) {
+      background-color: #0056b3; }
+    .liked-photos__prev-button:active:not(:disabled), .liked-photos__next-button:active:not(:disabled) {
+      background-color: #0056b3; }
 
 .modal {
   display: none;
