@@ -24,6 +24,7 @@ const modalPhotographerEl = modalEl.querySelector(".modal__photographer");
 const modalImgEl = modalEl.querySelector(".modal__img");
 
 let likedPhotosPage = 1;
+const likedPhotosPerPage = 4;
 
 showRandomPhoto();
 showLikedPhotos(likedPhotosPage);
@@ -33,7 +34,7 @@ randomNextButtonEl.addEventListener('click', e => {
   showRandomPhoto();
 })
 
-// открытие модального окна
+// событие открытия модального окна
 likedPhotosEl.addEventListener('click', (e) => {
   const likedPhoto = e.target.closest('.liked-photo');
   if (likedPhoto) {
@@ -41,11 +42,14 @@ likedPhotosEl.addEventListener('click', (e) => {
     modalImgEl.src = likedPhoto.querySelector('img').src;
     modalDescriptionEl.textContent = likedPhoto.querySelector('.liked-photo__description').textContent;
     modalPhotographerEl.textContent = likedPhoto.querySelector('.liked-photo__photographer').textContent;
-    openModalWindow();
+
+    modalImgEl.onload = () => {
+      openModalWindow();
+    };
   }
 });
 
-// закрытие модального окна
+// событие закрытия модального окна
 window.addEventListener('click', (e) => {
   if (e.target === modalEl) {
     closeModalWindow();
@@ -66,7 +70,7 @@ modalUnlikeBtnEl.addEventListener('click', e => {
   showLikedPhotos(likedPhotosPage);
 });
 
-// события навигации лайкнутыми изображениями
+// события навигации лайкнутыми фотографиями
 likedPhotosNavigationEl.addEventListener('click', e => {
   if (e.target.classList.contains('liked-photos__prev-button')) {
     likedPhotosPage--;
@@ -77,6 +81,9 @@ likedPhotosNavigationEl.addEventListener('click', e => {
   }
 })
 
+/**
+ * Закрывает модальное окно просмотра лайкнутой фотографии
+ */
 function closeModalWindow() {
   modalEl.classList.remove("show");
   setTimeout(() => {
@@ -84,6 +91,9 @@ function closeModalWindow() {
   }, 300);
 }
 
+/**
+ * Открывает модальное окно просмотра лайкнутой фотографии
+ */
 function openModalWindow() {
   modalEl.style.display = "block";
   setTimeout(() => {
@@ -92,7 +102,7 @@ function openModalWindow() {
 }
 
 /**
- * Функция показа случайной фотографии
+ * Запрашивает случайную фотографию с сервера и показывает ее
  * @returns {Promise<void>}
  */
 async function showRandomPhoto() {
@@ -133,11 +143,14 @@ async function showRandomPhoto() {
   }
 }
 
+/**
+ * Выводит список лайнутых фотографий согласно номеру страницы
+ * @param page
+ */
 function showLikedPhotos(page) {
   const likedPhotos = getLikedPhotos();
 
-  const perPage = 4;
-  const allPages = Math.ceil(likedPhotos.length / perPage);
+  const allPages = Math.ceil(likedPhotos.length / likedPhotosPerPage);
 
   if (page > allPages) {
     page = allPages;
@@ -145,14 +158,15 @@ function showLikedPhotos(page) {
     if (allPages > 0) likedPhotosPage = allPages;
   }
 
-  const startIdx = (page - 1) * perPage;
-  const endIdx = startIdx + perPage;
+  const startIdx = (page - 1) * likedPhotosPerPage;
+  const endIdx = startIdx + likedPhotosPerPage;
   const pageLikedPhotos = likedPhotos.slice(startIdx, endIdx);
 
   // контроль доступности кнопок навигации
   likedPhotosPrevButtonEl.disabled = page <= 1;
   likedPhotosNextButtonEl.disabled = page >= allPages;
 
+  // проходим по массиву и заменяем или добавляем нужные фотографии
   const displayedLikedPhotos = likedPhotosContainerEl.querySelectorAll('.liked-photo');
   for (let i = 0; i < pageLikedPhotos.length; i++) {
     if (displayedLikedPhotos.length >= i + 1) {
@@ -188,6 +202,11 @@ function showLikedPhotos(page) {
   likedPhotosAllPageEl.textContent = allPages;
 }
 
+/**
+ * Создает и возвращает узел лайкнутой фотографии
+ * @param likedPhotoObj
+ * @returns {Node}
+ */
 function createLikedPhotoNode(likedPhotoObj) {
   const likedPhotoTemplateEl = document.querySelector('.liked-photo__template');
   const likedPhotoNode = likedPhotoTemplateEl.content.cloneNode(true);
@@ -204,6 +223,10 @@ function saveLikedPhotos(likedPhotos) {
   localStorage.setItem('likedPhotos', JSON.stringify(likedPhotos));
 }
 
+/**
+ * Загружает лайкнутые фоки из localStarage
+ * @returns {any|*[]}
+ */
 function loadLikedPhotos() {
   const storedLikedPhotos = localStorage.getItem('likedPhotos');
   return storedLikedPhotos ? JSON.parse(storedLikedPhotos) : [];
@@ -213,6 +236,9 @@ function updateRandomPhotoLikesCount(likeCount) {
   randomLikesCountEl.textContent = likeCount;
 }
 
+/**
+ * Ручка для установки лайка фотографии
+ */
 function likeButtonHandler() {
   const photoId = randomPhotoEl.getAttribute('data-id');
   const photoUrl = randomPhotoImgEl.src;
@@ -224,6 +250,10 @@ function likeButtonHandler() {
   showLikedPhotos(likedPhotosPage);
 }
 
+/**
+ * Ручка для снятия лайка фотографии
+ * @param e
+ */
 function unlikeButtonHandler(e) {
   const photoId = randomPhotoEl.getAttribute('data-id');
   unlikePhoto(photoId);
@@ -232,6 +262,10 @@ function unlikeButtonHandler(e) {
   showLikedPhotos(likedPhotosPage);
 }
 
+/**
+ * Обновляет состояние кнопки LIKE у случайной фотографии
+ * @param isLiked
+ */
 function updateRandomPhotoLikeButton(isLiked) {
   const photoId = randomPhotoEl.getAttribute('data-id');
   if (!photoId) {
@@ -256,12 +290,24 @@ function updateRandomPhotoLikeButton(isLiked) {
   }
 }
 
+/**
+ * Проверяет по ID лайкнута ли фотография
+ * @param photoId
+ * @returns {boolean}
+ */
 function isLikedPhoto(photoId) {
   const likedPhotos = loadLikedPhotos();
   const index = likedPhotos.findIndex(e => e.id === photoId);
   return index >= 0;
 }
 
+/**
+ * Лайкает фотографию
+ * @param id
+ * @param url
+ * @param description
+ * @param photographer
+ */
 function likePhoto(id, url, description, photographer) {
   if (!isLikedPhoto(id)) {
     const likedPhotos = loadLikedPhotos();
@@ -270,6 +316,10 @@ function likePhoto(id, url, description, photographer) {
   }
 }
 
+/**
+ * Отменяет лайк фотографии
+ * @param photoId
+ */
 function unlikePhoto(photoId) {
   const likedPhotos = loadLikedPhotos();
   const index = likedPhotos.findIndex(e => e.id === photoId);
@@ -279,6 +329,10 @@ function unlikePhoto(photoId) {
   }
 }
 
+/**
+ * Возвращает массив с данными о лайкнутых фотографиях
+ * @returns {*|*[]}
+ */
 function getLikedPhotos() {
   return loadLikedPhotos();
 }

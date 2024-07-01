@@ -43,6 +43,7 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 1px solid #ccc;
     max-height: 55vh;
+    opacity: 0;
     transition: opacity 0.3s ease; }
   .random-photo__info {
     margin-bottom: 10px;
