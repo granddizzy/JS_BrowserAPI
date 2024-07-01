@@ -42,17 +42,7 @@ likedPhotosEl.addEventListener('click', (e) => {
     modalImgEl.src = likedPhoto.querySelector('img').src;
     modalDescriptionEl.textContent = likedPhoto.querySelector('.liked-photo__description').textContent;
     modalPhotographerEl.textContent = likedPhoto.querySelector('.liked-photo__photographer').textContent;
-
-    modalImgEl.onload = () => {
-      openModalWindow();
-    };
-  }
-});
-
-// событие закрытия модального окна
-window.addEventListener('click', (e) => {
-  if (e.target === modalEl) {
-    closeModalWindow();
+    openModalWindow();
   }
 });
 
@@ -92,9 +82,24 @@ function closeModalWindow() {
 }
 
 /**
+ * Ручка закрытия модального окна просмотра лайкнутой фотографии
+ */
+function handleCloseModalWindow(e) {
+  if (e.target === modalEl) {
+    closeModalWindow();
+
+    // удаляем обработчик закрытия при клике вне окна
+    window.removeEventListener('click', handleCloseModalWindow);
+  }
+}
+
+/**
  * Открывает модальное окно просмотра лайкнутой фотографии
  */
 function openModalWindow() {
+  // событие закрытия модального окна
+  window.addEventListener('click', handleCloseModalWindow);
+
   modalEl.style.display = "block";
   setTimeout(() => {
     modalEl.classList.add("show");
@@ -106,6 +111,30 @@ function openModalWindow() {
  * @returns {Promise<void>}
  */
 async function showRandomPhoto() {
+  const data = await getRandomPhoto();
+  const {urls, user} = data;
+
+  randomPhotoImgEl.style.opacity = '0';
+
+  randomPhotoEl.setAttribute('data-id', data.id);
+  randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
+  randomPhotographerEl.textContent = `${user.name}`;
+  randomDescriptionEl.textContent = data.description;
+
+  const isLiked = isLikedPhoto(data.id) ? 1 : 0;
+  updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
+  updateRandomPhotoLikeButton(isLiked);
+
+  setTimeout(() => {
+    randomPhotoImgEl.src = urls.regular;
+  }, 300);
+
+  randomPhotoImgEl.onload = () => {
+    randomPhotoImgEl.style.opacity = '1';
+  };
+}
+
+async function getRandomPhoto() {
   try {
     const request = '/photos/random';
     const response = await fetch(`${apiUrl}${request}`, {
@@ -116,27 +145,7 @@ async function showRandomPhoto() {
       throw new Error('Failed to fetch random photo');
     }
 
-    const data = await response.json();
-    const {urls, user} = data;
-
-    randomPhotoImgEl.style.opacity = '0';
-    randomPhotoEl.setAttribute('data-id', data.id);
-    randomPhotoImgEl.alt = data.alt_description || 'Random Photo';
-    randomPhotographerEl.textContent = `${user.name}`;
-    randomDescriptionEl.textContent = data.description;
-
-    const isLiked = isLikedPhoto(data.id) ? 1 : 0;
-    updateRandomPhotoLikesCount(data.likes + (isLiked ? 1 : 0));
-    updateRandomPhotoLikeButton(isLiked);
-
-    setTimeout(() => {
-      randomPhotoImgEl.src = urls.regular;
-    }, 300);
-
-    randomPhotoImgEl.onload = () => {
-      randomPhotoImgEl.style.opacity = '1';
-    };
-
+    return await response.json();
   } catch (error) {
     console.error('Error fetching random photo:', error.message);
     updateRandomPhotoLikeButton();
@@ -148,7 +157,7 @@ async function showRandomPhoto() {
  * @param page
  */
 function showLikedPhotos(page) {
-  const likedPhotos = getLikedPhotos();
+  const likedPhotos = loadLikedPhotos();
 
   const allPages = Math.ceil(likedPhotos.length / likedPhotosPerPage);
 
@@ -271,9 +280,8 @@ function updateRandomPhotoLikeButton(isLiked) {
   if (!photoId) {
     randomLikeButtonEl.disabled = true;
     return;
-  } else {
-    randomLikeButtonEl.disabled = false;
   }
+  randomLikeButtonEl.disabled = false;
 
   if (isLiked === undefined) {
     isLiked = isLikedPhoto(photoId);
@@ -327,12 +335,4 @@ function unlikePhoto(photoId) {
     likedPhotos.splice(index, 1);
     saveLikedPhotos(likedPhotos);
   }
-}
-
-/**
- * Возвращает массив с данными о лайкнутых фотографиях
- * @returns {*|*[]}
- */
-function getLikedPhotos() {
-  return loadLikedPhotos();
 }
