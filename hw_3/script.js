@@ -23,6 +23,10 @@ const modalDescriptionEl = modalEl.querySelector(".modal__description");
 const modalPhotographerEl = modalEl.querySelector(".modal__photographer");
 const modalImgEl = modalEl.querySelector(".modal__img");
 
+const scriptURL = document.currentScript.src;
+const scriptURLObj = new URL(scriptURL);
+const scriptDir = scriptURLObj.origin + scriptURLObj.pathname.substring(0, scriptURLObj.pathname.lastIndexOf('/'));
+
 let likedPhotosPage = 1;
 const likedPhotosPerPage = 4;
 
@@ -104,10 +108,14 @@ function openModalWindow() {
   setTimeout(() => {
     modalEl.classList.add("show");
   }, 10);
+
+  modalImgEl.onload = () => {
+    modalImgEl.style.opacity = '1';
+  };
 }
 
 /**
- * Запрашивает случайную фотографию с сервера и показывает ее
+ * Показывает случайную фотографию
  * @returns {Promise<void>}
  */
 async function showRandomPhoto() {
@@ -134,6 +142,10 @@ async function showRandomPhoto() {
   };
 }
 
+/**
+ * Запрашивает и получает случайную фотографию с сервера
+ * @returns {Promise<any>}
+ */
 async function getRandomPhoto() {
   try {
     const request = '/photos/random';
@@ -148,8 +160,22 @@ async function getRandomPhoto() {
     return await response.json();
   } catch (error) {
     console.error('Error fetching random photo:', error.message);
-    updateRandomPhotoLikeButton();
+    showErrorConnection(error.message);
   }
+}
+
+/**
+ * Показывает изображение ошибки соединения
+ */
+function showErrorConnection(errorMessage) {
+  randomPhotoEl.setAttribute('data-id', '');
+  randomPhotoImgEl.alt = '';
+  randomPhotographerEl.textContent = ``;
+  randomDescriptionEl.textContent = errorMessage;
+  updateRandomPhotoLikeButton(false);
+
+  randomPhotoImgEl.src = `${scriptDir}/img/404.jpg`;
+  randomPhotoImgEl.style.opacity = '1';
 }
 
 /**
@@ -282,10 +308,6 @@ function updateRandomPhotoLikeButton(isLiked) {
     return;
   }
   randomLikeButtonEl.disabled = false;
-
-  if (isLiked === undefined) {
-    isLiked = isLikedPhoto(photoId);
-  }
 
   if (isLiked) {
     randomLikeButtonEl.textContent = 'UnLike';
